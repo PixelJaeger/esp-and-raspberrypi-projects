@@ -1,0 +1,38 @@
+The .zip library needs to be added manually to the ArduinoIDE since newer versions will not work with the current code.
+
+Other libraries you might need in order to get the script to work are:
+- Adafruit BusIO by Adafruit
+- Adafruit GFX Library by Adafruit
+- Adafruit ILI9341 by AdaFruit 
+- DHT sensor library by Adafruit
+- DHT sensor library for ESPx by beegee_tokyo
+- TFT_eSPI by Bodmer (VERY IMPORTANT)
+
+--------- DO NOT UPDATE/AUTO-UPDATE THIS LIBRARY!-------------
+- NTPClient by Fabrice Weinberg (As above metioned: use the .zip file from this folder)
+--------- DO NOT UPDATE/AUTO-UPDATE THIS LIBRARY!-------------
+
+
+As for the Boards in ArduinoIDE:
+- esp32 by Espressif Systems (i use an ESP32-Dev Board and this one works fine)
+
+For the PinOUT and Conections:
+You can somewhat follow this Tutorial but it depends on what kind of ESP you are using.
+https://www.tech-sparks.com/using-esp32-with-arduino-ide-to-control-an-lcd-display/
+
+
+In this particular case use the following values in "Setup11_RPi_touch_ILI9486.h":
+#define TOUCH_CS 18
+#define TFT_MISO 2
+#define TFT_MOSI 12
+#define TFT_SCLK 14
+#define TFT_CS   5
+#define TFT_DC   15
+#define TFT_RST  13
+
+For this case use "ESP32 Dev Module" as Board under the Tools-Section in the ArduinoIDE. This will also change depending on the hardware you use.
+
+
+TFT_eSPI scripting examples can be found here:
+https://github.com/Bodmer/TFT_eSPI/tree/master/examples/480%20x%20320
+
