@@ -6,3 +6,4 @@ The folders are divided into self explained categories.<br>
 Unless stated otherwise (like in a folder name) everything is written in either micropython or python 3.x.x<br>
 <br>
 <br>
+
