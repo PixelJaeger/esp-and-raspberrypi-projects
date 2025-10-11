@@ -24,8 +24,7 @@ NTP a a method of getting the current time. It still contains code for DCF-Recev
 \- main.py
 \- boot.py
 \- dcf2rtc.py
-
-
+<br>
 ### Usage: <br>
 **WLAN:** <br>
 IF you are using NTP edit the NTP_BCD.py to contain your WIFI SSID and Password! <br>
