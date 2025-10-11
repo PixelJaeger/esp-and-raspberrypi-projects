@@ -1,4 +1,4 @@
-![1](/esp32%20bcd%20clock/project%20images/20241222_091254.jpg)
+![1](/esp32-esp8266/bcd%20clock/project%20images/20241222_091254.jpg)
 
 # BCD-Clock <br>
 Code for a Binary Coded Decimal Clock that gets TimeData via DCF OR NTP for an ESP32 (should also work with an ESP8266). <br>
