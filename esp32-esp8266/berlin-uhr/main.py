@@ -6,18 +6,17 @@ from machine import ADC, Pin
 # Beginn der einstellbaren Variabeln #
 ssid = ''
 password = ''
-#poti_div = 16   # Divisor für Poti-Wert. Poti_max war bei 4096. Also 4096 / 16 = 255 # "richtige" version ist anscheinend Raw-Wert / 4097... diese Zeile ist also sinnlos
 dim_tick = 0.05 # für das dimmen der LED. Nicht weniger als 0.05 weil neopixel sonst glitchen können.
-TZ_OFFSET = 3600 # Zeizzonen BS
+TZ_OFFSET = 3600 # Zeitzonen BS
 # Ende der einstellbaren Variabeln # 
 
 
 # "hardcodierte" Variabeln
-esp_pin = 13    # Daten-Pin
+esp_pin = 33    # Daten-Pin
 led_count = 37   # Anzahl der LEDs +1
 n = neopixel.NeoPixel(machine.Pin(esp_pin),led_count)
 
-adc = ADC(Pin(1))          # bekannter, funktionierender Pin
+adc = ADC(Pin(32))          # bekannter, funktionierender Pin
 adc.atten(ADC.ATTN_11DB)    # volle 0–3.3V
 adc.width(ADC.WIDTH_12BIT)
 
@@ -65,30 +64,32 @@ def set_h1(pair_index, color):
     a,b = h1_pairs[pair_index]
 #    print(a,color)
 #    print(b,color)
-    n[a] = color
-    n[b] = color
+    n[a] = dim(color, brightness)
+    n[b] = dim(color, brightness)
 # set_h1(pair-number, color)
+# n[a] = dim(color, brightness)
+# n[b] = dim(color, brightness)
 
 def set_h2(pair_index, color):
     a,b = h2_pairs[pair_index]
 #    print(a,color)
 #    print(b,color)
-    n[a] = color
-    n[b] = color
+    n[a] = dim(color, brightness)
+    n[b] = dim(color, brightness)
 # set_h2(pair-number, color)
 
 def set_m5(pair_index, color):
     a = m5_pairs[pair_index]
 #    print(a,color)
-    n[a] = color
+    n[a] = dim(color, brightness)
 # set_m5(pair-number, color)
 
 def set_mm(pair_index, color):
     a,b = mm_pairs[pair_index]
 #    print(a,color)
 #    print(b,color)
-    n[a] = color
-    n[b] = color
+    n[a] = dim(color, brightness)
+    n[b] = dim(color, brightness)
 # set_mm(pair-number, color)
 
 # Dimmer-Funktion
