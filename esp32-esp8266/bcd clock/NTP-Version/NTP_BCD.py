@@ -48,9 +48,30 @@ station.connect(ssid, password)
 while station.isconnected() == False:
   pass
 
-# adjustment for timezones
+def last_sunday(year, month):
+    # Scan backwards from day 31
+    for day in range(31, 24, -1):
+        try:
+            t = time.mktime((year, month, day, 0, 0, 0, 0, 0))
+            if time.localtime(t)[6] == 6:  # 6 = Sunday
+                return day
+        except:
+            pass
+
+def cet_offset(ts):
+    y = time.localtime(ts)[0]  # year
+    # DST starts last Sunday March 02:00
+    dst_start = time.mktime((y, 3, last_sunday(y, 3), 2, 0, 0, 0, 0))
+    # DST ends last Sunday October 03:00
+    dst_end   = time.mktime((y, 10, last_sunday(y, 10), 3, 0, 0, 0, 0))
+
+    return 7200 if dst_start <= ts < dst_end else 3600
+
+
 def localtime(secs=None):
-  return time.localtime((secs if secs else time.time()) + TZ_OFFSET)
+    ts = secs if secs else time.time()
+    return time.localtime(ts + cet_offset(ts))
+
 
 # get ntp-time for first time
 time.sleep(1)

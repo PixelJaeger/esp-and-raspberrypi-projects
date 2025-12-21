@@ -7,9 +7,7 @@ from machine import ADC, Pin
 ssid = ''
 password = ''
 dim_tick = 0.05 # für das dimmen der LED. Nicht weniger als 0.05 weil neopixel sonst glitchen können.
-TZ_OFFSET = 3600 # Zeitzonen BS
 # Ende der einstellbaren Variabeln # 
-
 
 # "hardcodierte" Variabeln
 esp_pin = 33    # Daten-Pin
@@ -20,19 +18,16 @@ adc = ADC(Pin(32))          # bekannter, funktionierender Pin
 adc.atten(ADC.ATTN_11DB)    # volle 0–3.3V
 adc.width(ADC.WIDTH_12BIT)
 
-
 # Farben der LEDs
 aus = 0,0,0
 red = 255,0,0
 yel = 255,180,0
-
 
 # LED Paare
 h1_pairs = [(2,3),(4,5),(6,7),(8,9)]
 h2_pairs = [(10,11),(12,13),(14,15),(16,17)]
 m5_pairs = [(18),(19),(20),(21),(22),(23),(24),(25),(26),(27),(28)]
 mm_pairs = [(29,30),(31,32),(33,34),(35,36)]
-
 
 # Netzwerk/WLAN anwerfen
 try:
@@ -55,9 +50,29 @@ while station.isconnected() == False:
   pass
 
 
-# adjustment for timezones
+def last_sunday(year, month):
+    # Scan backwards from day 31
+    for day in range(31, 24, -1):
+        try:
+            t = time.mktime((year, month, day, 0, 0, 0, 0, 0))
+            if time.localtime(t)[6] == 6:  # 6 = Sunday
+                return day
+        except:
+            pass
+
+def cet_offset(ts):
+    y = time.localtime(ts)[0]  # year
+    # DST starts last Sunday March 02:00
+    dst_start = time.mktime((y, 3, last_sunday(y, 3), 2, 0, 0, 0, 0))
+    # DST ends last Sunday October 03:00
+    dst_end   = time.mktime((y, 10, last_sunday(y, 10), 3, 0, 0, 0, 0))
+
+    return 7200 if dst_start <= ts < dst_end else 3600
+
+
 def localtime(secs=None):
-  return time.localtime((secs if secs else time.time()) + TZ_OFFSET)
+    ts = secs if secs else time.time()
+    return time.localtime(ts + cet_offset(ts))
 
 # funktionen fuer Mengenlehre-Uhrzeit zu LEDs
 def set_h1(pair_index, color):
@@ -134,7 +149,6 @@ while True:
     berlin()
 
     # Mengenlehre Uhrzeit zu den LEDs schieben
-    # kurze version
     # h1 and h2
     for i in range(4):
         set_h1(i, red if i < h1 else aus)
@@ -172,235 +186,3 @@ while True:
     time.sleep(dim_tick)
 
 
-
-
-
-
-'''
-# Mengenlehre Uhrzeit zu den LEDs schieben
-# lange version, falls die kurze nicht funktioniert
-if h1==0:
-    set_h1(0, aus)
-    set_h1(1, aus)
-    set_h1(2, aus)
-    set_h1(3, aus)
-if h1==1:
-    set_h1(0, red)
-    set_h1(1, aus)
-    set_h1(2, aus)
-    set_h1(3, aus)
-if h1==2:
-    set_h1(0, red)
-    set_h1(1, red)
-    set_h1(2, aus)
-    set_h1(3, aus)
-if h1==3:
-    set_h1(0, red)
-    set_h1(1, red)
-    set_h1(2, red)
-    set_h1(3, aus)
-if h1==4:
-    set_h1(0, red)
-    set_h1(1, red)
-    set_h1(2, red)
-    set_h1(3, red)
-
-
-if h2==0:
-    set_h2(0, aus)
-    set_h2(1, aus)
-    set_h2(2, aus)
-    set_h2(3, aus)
-if h2==1:
-    set_h2(0, red)
-    set_h2(1, aus)
-    set_h2(2, aus)
-    set_h2(3, aus)
-if h2==2:
-    set_h2(0, red)
-    set_h2(1, red)
-    set_h2(2, aus)
-    set_h2(3, aus)
-if h2==3:
-    set_h2(0, red)
-    set_h2(1, red)
-    set_h2(2, red)
-    set_h2(3, aus)
-if h2==4:
-    set_h2(0, red)
-    set_h2(1, red)
-    set_h2(2, red)
-    set_h2(3, red)
-
-
-if m5==0:
-    set_m5(0, aus)
-    set_m5(1, aus)
-    set_m5(2, aus)
-    set_m5(3, aus)
-    set_m5(4, aus)
-    set_m5(5, aus)
-    set_m5(6, aus)
-    set_m5(7, aus)
-    set_m5(8, aus)
-    set_m5(9, aus)
-    set_m5(10, aus)
-if m5==1:
-    set_m5(0, yel)
-    set_m5(1, aus)
-    set_m5(2, aus)
-    set_m5(3, aus)
-    set_m5(4, aus)
-    set_m5(5, aus)
-    set_m5(6, aus)
-    set_m5(7, aus)
-    set_m5(8, aus)
-    set_m5(9, aus)
-    set_m5(10, aus)
-if m5==2:
-    set_m5(0, yel)
-    set_m5(1, yel)
-    set_m5(2, aus)
-    set_m5(3, aus)
-    set_m5(4, aus)
-    set_m5(5, aus)
-    set_m5(6, aus)
-    set_m5(7, aus)
-    set_m5(8, aus)
-    set_m5(9, aus)
-    set_m5(10, aus)
-if m5==3:
-    set_m5(0, yel)
-    set_m5(1, yel)
-    set_m5(2, red)
-    set_m5(3, aus)
-    set_m5(4, aus)
-    set_m5(5, aus)
-    set_m5(6, aus)
-    set_m5(7, aus)
-    set_m5(8, aus)
-    set_m5(9, aus)
-    set_m5(10, aus)
-if m5==4:
-    set_m5(0, yel)
-    set_m5(1, yel)
-    set_m5(2, red)
-    set_m5(3, yel)
-    set_m5(4, aus)
-    set_m5(5, aus)
-    set_m5(6, aus)
-    set_m5(7, aus)
-    set_m5(8, aus)
-    set_m5(9, aus)
-    set_m5(10, aus)
-if m5==5:
-    set_m5(0, yel)
-    set_m5(1, yel)
-    set_m5(2, red)
-    set_m5(3, yel)
-    set_m5(4, yel)
-    set_m5(5, aus)
-    set_m5(6, aus)
-    set_m5(7, aus)
-    set_m5(8, aus)
-    set_m5(9, aus)
-    set_m5(10, aus)
-if m5==6:
-    set_m5(0, yel)
-    set_m5(1, yel)
-    set_m5(2, red)
-    set_m5(3, yel)
-    set_m5(4, yel)
-    set_m5(5, red)
-    set_m5(6, aus)
-    set_m5(7, aus)
-    set_m5(8, aus)
-    set_m5(9, aus)
-    set_m5(10, aus)
-if m5==7:
-    set_m5(0, yel)
-    set_m5(1, yel)
-    set_m5(2, red)
-    set_m5(3, yel)
-    set_m5(4, yel)
-    set_m5(5, red)
-    set_m5(6, yel)
-    set_m5(7, aus)
-    set_m5(8, aus)
-    set_m5(9, aus)
-    set_m5(10, aus)
-if m5==8:
-    set_m5(0, yel)
-    set_m5(1, yel)
-    set_m5(2, red)
-    set_m5(3, yel)
-    set_m5(4, yel)
-    set_m5(5, red)
-    set_m5(6, yel)
-    set_m5(7, yel)
-    set_m5(8, aus)
-    set_m5(9, aus)
-    set_m5(10, aus)
-if m5==9:
-    set_m5(0, yel)
-    set_m5(1, yel)
-    set_m5(2, red)
-    set_m5(3, yel)
-    set_m5(4, yel)
-    set_m5(5, red)
-    set_m5(6, yel)
-    set_m5(7, yel)
-    set_m5(8, red)
-    set_m5(9, aus)
-    set_m5(10, aus)
-    set_m5(0, yel)
-    set_m5(1, yel)
-    set_m5(2, red)
-    set_m5(3, yel)
-    set_m5(4, yel)
-    set_m5(5, red)
-    set_m5(6, yel)
-    set_m5(7, yel)
-    set_m5(8, red)
-    set_m5(9, yel)
-    set_m5(10, yel)
-if m5==11:
-    set_m5(0, yel)
-    set_m5(1, yel)
-    set_m5(2, red)
-    set_m5(3, yel)
-    set_m5(4, yel)
-    set_m5(5, red)
-    set_m5(6, yel)
-    set_m5(7, yel)
-    set_m5(8, red)
-    set_m5(9, yel)
-    set_m5(10, yel)
-
-
-if mm==0:
-    set_mm(0, aus)
-    set_mm(1, aus)
-    set_mm(2, aus)
-    set_mm(3, aus)
-if mm==1:
-    set_mm(0, yel)
-    set_mm(1, aus)
-    set_mm(2, aus)
-    set_mm(3, aus)
-if mm==2:
-    set_mm(0, yel)
-    set_mm(1, yel)
-    set_mm(2, aus)
-    set_mm(3, aus)
-if mm==3:
-    set_mm(0, yel)
-    set_mm(1, yel)
-    set_mm(2, yel)
-    set_mm(3, aus)
-if mm==4:
-    set_mm(0, yel)
-    set_mm(1, yel)
-    set_mm(2, yel)
-    set_mm(3, yel)
-'''

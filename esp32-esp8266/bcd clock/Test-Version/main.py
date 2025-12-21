@@ -24,8 +24,7 @@ s_g=0
 s_b=0
 # Helligkeit f眉r weisse LEDs  0-250
 pwm_bright=250
-# Zeitzonen Wert CET+1 = 3600
-TZ_OFFSET = 3600
+
 
 #rtc = RTC()
 
@@ -51,9 +50,29 @@ while station.isconnected() == False:
   pass
 
 
+def last_sunday(year, month):
+    # Scan backwards from day 31
+    for day in range(31, 24, -1):
+        try:
+            t = time.mktime((year, month, day, 0, 0, 0, 0, 0))
+            if time.localtime(t)[6] == 6:  # 6 = Sunday
+                return day
+        except:
+            pass
+
+def cet_offset(ts):
+    y = time.localtime(ts)[0]  # year
+    # DST starts last Sunday March 02:00
+    dst_start = time.mktime((y, 3, last_sunday(y, 3), 2, 0, 0, 0, 0))
+    # DST ends last Sunday October 03:00
+    dst_end   = time.mktime((y, 10, last_sunday(y, 10), 3, 0, 0, 0, 0))
+
+    return 7200 if dst_start <= ts < dst_end else 3600
+
+
 def localtime(secs=None):
-  """Convert the time secs expressed in seconds since the Epoch into an 8-tuple which contains: (year, month, mday, hour, minute, second, weekday, yearday) If secs is not provided or None, then the current time from the RTC is used."""
-  return time.localtime((secs if secs else time.time()) + TZ_OFFSET)
+    ts = secs if secs else time.time()
+    return time.localtime(ts + cet_offset(ts))
 
 
 time.sleep(1)
