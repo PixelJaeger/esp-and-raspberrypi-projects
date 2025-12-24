@@ -4,8 +4,8 @@ from ntptime import settime
 from machine import ADC, Pin
 
 # Beginn der einstellbaren Variabeln #
-ssid = ''
-password = ''
+ssid = ''       # eventuell überflüssig, wenn der wifimanager läuft. Muss aber vorher umgeschrieben werden (uasyncio)
+password = ''   # eventuell überflüssig, wenn der wifimanager läuft. Muss aber vorher umgeschrieben werden (uasyncio)
 dim_tick = 0.05 # für das dimmen der LED. Nicht weniger als 0.05 weil neopixel sonst glitchen können.
 # Ende der einstellbaren Variabeln # 
 
