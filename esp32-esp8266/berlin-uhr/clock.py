@@ -3,6 +3,13 @@ import time
 from ntptime import settime
 from machine import ADC, Pin
 
+# uAsyncio Table
+# Seconds-LEDs = await 1 second
+# Minute and Hour LEDs = await 1 second (not 60 because RTC/NPT/async jitter)
+# Webserver = no await value since I/O driven
+# Poti/Dimmer = 20-100 milliseconds
+# NTP Sync = once every 24 hours
+
 # Beginn der einstellbaren Variabeln #
 ssid = ''
 password = ''
@@ -29,26 +36,6 @@ h2_pairs = [(10,11),(12,13),(14,15),(16,17)]
 m5_pairs = [(18),(19),(20),(21),(22),(23),(24),(25),(26),(27),(28)]
 mm_pairs = [(29,30),(31,32),(33,34),(35,36)]
 
-# Netzwerk/WLAN anwerfen
-try:
-  import usocket as socket
-except:
-  import socket
-
-import network
-import esp
-esp.osdebug(None)
-import gc
-gc.collect()
-
-station = network.WLAN(network.STA_IF)
-
-station.active(True)
-station.connect(ssid, password)
-
-while station.isconnected() == False:
-  pass
-
 
 def last_sunday(year, month):
     # Scan backwards from day 31
@@ -69,7 +56,6 @@ def cet_offset(ts):
 
     return 7200 if dst_start <= ts < dst_end else 3600
 
-
 def localtime(secs=None):
     ts = secs if secs else time.time()
     return time.localtime(ts + cet_offset(ts))
@@ -77,32 +63,23 @@ def localtime(secs=None):
 # funktionen fuer Mengenlehre-Uhrzeit zu LEDs
 def set_h1(pair_index, color):
     a,b = h1_pairs[pair_index]
-#    print(a,color)
-#    print(b,color)
     n[a] = dim(color, brightness)
     n[b] = dim(color, brightness)
 # set_h1(pair-number, color)
-# n[a] = dim(color, brightness)
-# n[b] = dim(color, brightness)
 
 def set_h2(pair_index, color):
     a,b = h2_pairs[pair_index]
-#    print(a,color)
-#    print(b,color)
     n[a] = dim(color, brightness)
     n[b] = dim(color, brightness)
 # set_h2(pair-number, color)
 
 def set_m5(pair_index, color):
     a = m5_pairs[pair_index]
-#    print(a,color)
     n[a] = dim(color, brightness)
 # set_m5(pair-number, color)
 
 def set_mm(pair_index, color):
     a,b = mm_pairs[pair_index]
-#    print(a,color)
-#    print(b,color)
     n[a] = dim(color, brightness)
     n[b] = dim(color, brightness)
 # set_mm(pair-number, color)
@@ -115,7 +92,6 @@ def dim(color, brightness):
         int(g * brightness),
         int(b * brightness)
     )
-
 
 #umrechnen von normaler Uhrzeit nach mengen-unhrzeit
 def berlin():
@@ -132,13 +108,17 @@ def berlin():
     print(h1,h2,m5,mm) #debug
 
 
-#einmalig ausführen
+# !!!Muss VOR allen Asyncs ausgeführt werden!!!
+# einmalig ausführen
 # aktuelle Uhrzeit holen. Die Pause davor und danach dient zur Sicherheit
 time.sleep(1)
 settime()
 time.sleep(1)
+# !!!Muss VOR allen Asyncs ausgeführt werden!!!
 
 
+
+# !!!Muss umgeschrieben werden!!!
 # in permanenter Schleife abarbeiten
 while True:
     # poti kram (BETA Version)
